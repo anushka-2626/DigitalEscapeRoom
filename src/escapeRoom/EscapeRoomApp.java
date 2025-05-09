@@ -37,7 +37,7 @@ public class EscapeRoomApp extends JFrame {
 
         hauntedSchoolBtn = new JButton("Haunted School");
         libraryBtn = new JButton("Library (Locked)");
-        jailBtn = new JButton("Jail (Coming Soon)");
+        jailBtn = new JButton("Jail (Locked)");
         hospitalBtn = new JButton("Hospital (Coming Soon)");
         forestBtn = new JButton("Forest (Coming Soon)");
 
@@ -47,7 +47,7 @@ public class EscapeRoomApp extends JFrame {
         hospitalBtn.setFont(new Font("SansSerif", Font.PLAIN, 18));
         forestBtn.setFont(new Font("SansSerif", Font.PLAIN, 18));
 
-        jailBtn.setEnabled(false); // Initially locked
+        //jailBtn.setEnabled(false); // Initially locked
 
         buttonPanel.add(hauntedSchoolBtn);
         buttonPanel.add(libraryBtn);
@@ -80,8 +80,7 @@ public class EscapeRoomApp extends JFrame {
         });
 
         jailBtn.addActionListener(e -> {
-            if (jailKeyObtained) {
-                // TODO: Open Jail game window when implemented
+            if (KeyManager.hasJailKey()) {
                 JOptionPane.showMessageDialog(this,
                         "Welcome to Jail! (Not implemented yet.)",
                         "Jail", JOptionPane.INFORMATION_MESSAGE);
@@ -116,9 +115,11 @@ public class EscapeRoomApp extends JFrame {
         if (jailKeyObtained) {
             jailBtn.setText("Jail");
             jailBtn.setEnabled(true);
+            statusLabel.setText("You have the Jail Key! You can enter the Jail now.");
         } else {
             jailBtn.setText("Jail (Locked)");
-            jailBtn.setEnabled(false);
+            jailBtn.setEnabled(true);
+            statusLabel.setText("Get the Jail Key from Library to unlock Jail.");
         }
     }
 
@@ -138,6 +139,7 @@ public class EscapeRoomApp extends JFrame {
      */
     public void jailKeyObtained() {
         jailKeyObtained = true;
+        KeyManager.obtainJailKey();
         updateButtonStates();
         JOptionPane.showMessageDialog(this,
                 "Jail Key obtained! You can now enter the Jail.",
