@@ -81,10 +81,16 @@ public class EscapeRoomApp extends JFrame {
 
         jailBtn.addActionListener(e -> {
             if (KeyManager.hasJailKey()) {
+<<<<<<< HEAD
                 /*JOptionPane.showMessageDialog(this,
                         "Welcome to Jail! (Not implemented yet.)",
                         "Jail", JOptionPane.INFORMATION_MESSAGE);*/
                 new Jail(EscapeRoomApp.this).setVisible(true);
+=======
+                JOptionPane.showMessageDialog(this,
+                        "Welcome to Jail! (Not implemented yet.)",
+                        "Jail", JOptionPane.INFORMATION_MESSAGE);
+>>>>>>> 3013dce9e0d43a722457cd1cc1bf3640f115611d
             } else {
                 JOptionPane.showMessageDialog(this,
                         "You need the Jail Key from Library Escape to enter the Jail.",
