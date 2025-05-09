@@ -4,7 +4,6 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
-import java.net.URL;
 
 public class Library extends JFrame {
 
@@ -26,7 +25,7 @@ public class Library extends JFrame {
     private boolean inscriptionFound = false;
     private EscapeRoomApp mainApp;
 
-    private Image backgroundImage;  // Moved from local to field
+    private Image backgroundImage;
 
     public Library(EscapeRoomApp mainApp) {
         this.mainApp = mainApp;
@@ -37,7 +36,6 @@ public class Library extends JFrame {
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
-        // Load background image, assigning to class field
         try {
             backgroundImage = ImageIO.read(getClass().getResource("/images/library_bg.jpg"));
         } catch (IOException e) {
@@ -76,7 +74,7 @@ public class Library extends JFrame {
         buttonPanel.setLayout(new GridLayout(10, 1, 10, 10));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 50, 20, 50));
 
-        // Initialize buttons
+        // Buttons
         searchBookshelfBtn = new JButton("Search bookshelf labeled 'Ancient Texts'");
         checkDeskBtn = new JButton("Check librarian’s desk");
         examinePaintingBtn = new JButton("Examine painting on the wall");
@@ -88,7 +86,7 @@ public class Library extends JFrame {
         lookForMissingDigitsBtn = new JButton("Look for missing digits");
         enterCodeBtn = new JButton("Enter code to unlock door");
 
-        // Set initial visibility
+        // Initial visibility
         inspectPaperBtn.setVisible(false);
         translateSymbolsBtn.setVisible(false);
         tryOpeningDrawerBtn.setVisible(false);
@@ -111,25 +109,89 @@ public class Library extends JFrame {
         backgroundPanel.add(buttonPanel, BorderLayout.SOUTH);
         add(backgroundPanel);
 
-        // The rest of your action listeners here unchanged...
-        // For brevity I'm not repeating all listeners here; you can keep your previous listener code.
-        // Just be sure to replace 'backgroundImage' usage as now it's a field.
+        // --- Action Listeners ---
 
-        // Example listener for searchBookshelfBtn:
         searchBookshelfBtn.addActionListener(e -> {
             setStory("You find a book titled \"Secrets of the Forgotten.\" A paper slips out as you open it: “Knowledge lies in numbers.”");
             inspectPaperBtn.setVisible(true);
             hideButtonsExcept(inspectPaperBtn);
         });
 
-        // ... Add remaining listeners similarly and call your helper methods
+        inspectPaperBtn.addActionListener(e -> {
+            setStory("The paper has cryptic symbols: “VIII – II – V – I”.");
+            translateSymbolsBtn.setVisible(true);
+            hideButtonsExcept(translateSymbolsBtn);
+        });
 
-        // Initialize first screen
+        translateSymbolsBtn.addActionListener(e -> {
+            setStory("You translate the Roman numerals: 8 – 2 – 5 – 1. These might be part of a code.");
+            partialCode = "8251";
+            partialCodeFound = true;
+            returnToCenterBtn.setVisible(true);
+            hideButtonsExcept(returnToCenterBtn);
+        });
+
+        checkDeskBtn.addActionListener(e -> {
+            setStory("You find a locked drawer and a half-burnt note: “Not all books are for reading.”");
+            tryOpeningDrawerBtn.setVisible(true);
+            hideButtonsExcept(tryOpeningDrawerBtn, returnToCenterBtn);
+        });
+
+        tryOpeningDrawerBtn.addActionListener(e -> {
+            setStory("The drawer is locked tight. You need a key or a code.");
+            returnToCenterBtn.setVisible(true);
+            hideButtonsExcept(returnToCenterBtn);
+        });
+
+        examinePaintingBtn.addActionListener(e -> {
+            setStory("You notice the painting is slightly ajar... Behind it is a dusty mirror and an inscription.");
+            readInscriptionBtn.setVisible(true);
+            hideButtonsExcept(readInscriptionBtn);
+        });
+
+        readInscriptionBtn.addActionListener(e -> {
+            setStory("“Four digits unlock what knowledge binds.” Underneath, someone scribbled: 3, 6, ?, ?");
+            inscriptionFound = true;
+            inscriptionCodePart = "36";
+            lookForMissingDigitsBtn.setVisible(true);
+            hideButtonsExcept(lookForMissingDigitsBtn);
+        });
+
+        lookForMissingDigitsBtn.addActionListener(e -> {
+            if (partialCodeFound) {
+                setStory("You match the codes: 3, 6, " + partialCode.charAt(2) + ", " + partialCode.charAt(3) +
+                        ". That gives you 3 6 5 1. Try this?");
+                enterCodeBtn.setVisible(true);
+            } else {
+                setStory("You’re missing some digits. Maybe check the bookshelf?");
+            }
+            returnToCenterBtn.setVisible(true);
+            hideButtonsExcept(enterCodeBtn, returnToCenterBtn);
+        });
+
+        enterCodeBtn.addActionListener(e -> {
+            String input = JOptionPane.showInputDialog(this, "Enter the 4-digit code:");
+            if (input != null && input.equals("3651")) {
+                setStory("✅ The door clicks open. You've escaped the Library!");
+                JOptionPane.showMessageDialog(this, "🎉 Well done! You’ve completed the Library escape.");
+                dispose();
+                //mainApp.returnToMainMenu(); // Optional hook back to main menu
+            } else {
+                JOptionPane.showMessageDialog(this, "❌ The code is incorrect. Try again!");
+            }
+        });
+
+        returnToCenterBtn.addActionListener(e -> {
+            setStoryInitial();
+            resetButtons();
+        });
+
+        // Initial display
         setStoryInitial();
         resetButtons();
     }
 
-    // Helper methods like setStory(), setStoryInitial(), resetButtons(), hideButtonsExcept() remain the same.
+    // Helper methods
 
     private void setStory(String text) {
         storyArea.setText(text);
