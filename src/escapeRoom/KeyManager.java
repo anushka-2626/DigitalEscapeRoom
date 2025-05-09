@@ -6,6 +6,7 @@ package escapeRoom;
  */
 public class KeyManager {
     private static boolean libraryKey = false;
+    private static boolean jailkey=false;
 
     public static boolean hasLibraryKey() {
         return libraryKey;
@@ -14,5 +15,14 @@ public class KeyManager {
     public static void obtainLibraryKey() {
         libraryKey = true;
     }
+
+    public static boolean hasJailKey() {
+        return jailkey;
+    }
+
+    public static void obtainJailKey() {
+        jailkey = true;
+    }
+
 }
 
