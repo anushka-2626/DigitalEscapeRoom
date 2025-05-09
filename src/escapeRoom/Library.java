@@ -1,9 +1,13 @@
 package escapeRoom;
 
 import javax.imageio.ImageIO;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
+import java.net.URL;
 
 public class Library extends JFrame {
 
@@ -24,8 +28,10 @@ public class Library extends JFrame {
     private boolean partialCodeFound = false;
     private boolean inscriptionFound = false;
     private EscapeRoomApp mainApp;
+    private boolean hasJailKey = false;
 
     private Image backgroundImage;
+    private Clip backgroundClip;
 
     public Library(EscapeRoomApp mainApp) {
         this.mainApp = mainApp;
@@ -112,18 +118,21 @@ public class Library extends JFrame {
         // --- Action Listeners ---
 
         searchBookshelfBtn.addActionListener(e -> {
+            playSound("click.wav", false);
             setStory("You find a book titled \"Secrets of the Forgotten.\" A paper slips out as you open it: “Knowledge lies in numbers.”");
             inspectPaperBtn.setVisible(true);
             hideButtonsExcept(inspectPaperBtn);
         });
 
         inspectPaperBtn.addActionListener(e -> {
+            playSound("click.wav", false);
             setStory("The paper has cryptic symbols: “VIII – II – V – I”.");
             translateSymbolsBtn.setVisible(true);
             hideButtonsExcept(translateSymbolsBtn);
         });
 
         translateSymbolsBtn.addActionListener(e -> {
+            playSound("click.wav", false);
             setStory("You translate the Roman numerals: 8 – 2 – 5 – 1. These might be part of a code.");
             partialCode = "8251";
             partialCodeFound = true;
@@ -132,24 +141,34 @@ public class Library extends JFrame {
         });
 
         checkDeskBtn.addActionListener(e -> {
+            playSound("click.wav", false);
             setStory("You find a locked drawer and a half-burnt note: “Not all books are for reading.”");
             tryOpeningDrawerBtn.setVisible(true);
             hideButtonsExcept(tryOpeningDrawerBtn, returnToCenterBtn);
         });
 
         tryOpeningDrawerBtn.addActionListener(e -> {
+            playSound("click.wav", false);
             setStory("The drawer is locked tight. You need a key or a code.");
-            returnToCenterBtn.setVisible(true);
-            hideButtonsExcept(returnToCenterBtn);
+            if(partialCodeFound && inscriptionFound){
+                enterCodeBtn.setVisible(true);
+                hideButtonsExcept(enterCodeBtn);
+            }
+            else {
+                returnToCenterBtn.setVisible(true);
+                hideButtonsExcept(returnToCenterBtn);
+            }
         });
 
         examinePaintingBtn.addActionListener(e -> {
+            playSound("click.wav", false);
             setStory("You notice the painting is slightly ajar... Behind it is a dusty mirror and an inscription.");
             readInscriptionBtn.setVisible(true);
             hideButtonsExcept(readInscriptionBtn);
         });
 
         readInscriptionBtn.addActionListener(e -> {
+            playSound("click.wav", false);
             setStory("“Four digits unlock what knowledge binds.” Underneath, someone scribbled: 3, 6, ?, ?");
             inscriptionFound = true;
             inscriptionCodePart = "36";
@@ -158,22 +177,30 @@ public class Library extends JFrame {
         });
 
         lookForMissingDigitsBtn.addActionListener(e -> {
+            playSound("click.wav", false);
             if (partialCodeFound) {
                 setStory("You match the codes: 3, 6, " + partialCode.charAt(2) + ", " + partialCode.charAt(3) +
                         ". That gives you 3 6 5 1. Try this?");
-                enterCodeBtn.setVisible(true);
+                //enterCodeBtn.setVisible(true);
             } else {
                 setStory("You’re missing some digits. Maybe check the bookshelf?");
             }
             returnToCenterBtn.setVisible(true);
-            hideButtonsExcept(enterCodeBtn, returnToCenterBtn);
+            hideButtonsExcept(returnToCenterBtn);
         });
 
         enterCodeBtn.addActionListener(e -> {
+            playSound("click.wav", false);
             String input = JOptionPane.showInputDialog(this, "Enter the 4-digit code:");
             if (input != null && input.equals("3651")) {
-                setStory("✅ The door clicks open. You've escaped the Library!");
-                JOptionPane.showMessageDialog(this, "🎉 Well done! You’ve completed the Library escape.");
+                setStory("✅ The drawer opens. You've found the key to escape the Library!");
+                JOptionPane.showMessageDialog(this, "You unlocked Jail Escape level. Return to the hallway to proceed.", "Key Acquired", JOptionPane.INFORMATION_MESSAGE);
+                if (!hasJailKey) {
+                    hasJailKey = true;
+                    if (mainApp != null) {
+                        mainApp.jailKeyObtained();
+                    }
+                }
                 dispose();
                 //mainApp.returnToMainMenu(); // Optional hook back to main menu
             } else {
@@ -190,7 +217,34 @@ public class Library extends JFrame {
         setStoryInitial();
         resetButtons();
     }
+    private void playSound(String soundFileName, boolean loop) {
+        try {
+            URL soundURL = getClass().getResource("/sounds/" + soundFileName);
+            if (soundURL == null) {
+                System.err.println("Sound file not found: " + soundFileName);
+                return;
+            }
+            AudioInputStream audioIn = AudioSystem.getAudioInputStream(soundURL);
+            Clip clip = AudioSystem.getClip();
+            clip.open(audioIn);
+            if (loop) {
+                clip.loop(Clip.LOOP_CONTINUOUSLY);
+                backgroundClip = clip;
+            }
+            clip.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
+    // Stop background music
+    private void stopBackgroundSound() {
+        if (backgroundClip != null && backgroundClip.isRunning()) {
+            backgroundClip.stop();
+            backgroundClip.close();
+            backgroundClip = null;
+        }
+    }
     // Helper methods
 
     private void setStory(String text) {
