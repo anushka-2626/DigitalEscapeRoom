@@ -32,7 +32,7 @@ public class HauntedSchool extends JFrame {
 
         setTitle("Haunted School");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(700, 500);
+        setSize(900, 700);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 

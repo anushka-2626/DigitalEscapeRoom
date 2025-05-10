@@ -42,7 +42,7 @@ public class Jail extends JFrame {
     private Inventory inventory;
 
     // For symbol puzzle
-    private final String[] symbolSequence = {"Δ", "☉", "♢", "▲"};  // correct order
+    private final String[] symbolSequence = {"☉", "▲","♢","Δ"};  // correct order
     private final HashSet<String> symbolSet = new HashSet<>();
     private JButton[] symbolButtons;
     private StringBuilder chosenSequence = new StringBuilder();
@@ -53,7 +53,7 @@ public class Jail extends JFrame {
 
         setTitle("Jail Escape");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(700, 520);
+        setSize(900, 700);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
@@ -162,7 +162,7 @@ public class Jail extends JFrame {
 
         inspectWallBtn.addActionListener(e -> {
             playSound("click.wav", false);
-            setStory("On the wall, you see strange symbols drawn in a sequence: Δ, ☉, ♢, ▲. They seem important.");
+            setStory("On the wall, you see strange symbols drawn in a sequence: ☉,▲,♢,Δ. They seem important.");
             digSpotBtn.setVisible(spoonFound);
             lookForClueBtn.setVisible(true);
             hideButtonsExcept(digSpotBtn, lookForClueBtn, viewInventoryBtn);
@@ -175,7 +175,7 @@ public class Jail extends JFrame {
                 readNoteBtn.setVisible(true);
                 hideButtonsExcept(readNoteBtn, viewInventoryBtn);
             } else {
-                setStory("Remember the symbol sequence on the wall: Δ, ☉, ♢, ▲. It might open something hidden.");
+                setStory("Remember the symbol sequence on the wall: ☉,▲,♢,Δ. It might open something hidden.");
                 digSpotBtn.setVisible(spoonFound);
                 hideButtonsExcept(digSpotBtn, viewInventoryBtn);
             }
@@ -244,7 +244,7 @@ public class Jail extends JFrame {
         puzzleDialog.setLocationRelativeTo(this);
         puzzleDialog.setLayout(new BorderLayout());
 
-        JLabel instructions = new JLabel("<html>Click the symbols in the correct order to unlock the locker.<br/>Symbols: Δ, ☉, ♢, ▲</html>", SwingConstants.CENTER);
+        JLabel instructions = new JLabel("<html>Click the symbols in the correct order to unlock the locker.</html>", SwingConstants.CENTER);
         instructions.setFont(new Font("Serif", Font.BOLD, 16));
         puzzleDialog.add(instructions, BorderLayout.NORTH);
 
